@@ -52,6 +52,7 @@ The system includes:
  ### Countdown Handling
 
  - Use `millis()` for non-blocking timing:
+   
    ```cpp
    if (currentMillis - lastUpdate >= 1000) {
     countdownValue--;
@@ -103,7 +104,7 @@ if (IrReceiver.decode()) { ... }
 - Acts as a safety key: must remain in correct range for 5 seconds to deactivate the bomb.
 
 ### Photoresistor
-- Detects surrounding light; if too bright, the bomb detonates.
+- Detects surrounding light: if too bright, the bomb detonates.
 
 ### Serial Monitor
 
