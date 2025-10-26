@@ -22,7 +22,7 @@ The system includes:
 - IR Receiver
 - IR Remote
 ##
-![Circuit Screenshot](screenshot.png)
+![Circuit Screenshot](https://github.com/dimitrkout2003/Arduino-Bomb-Detonator-Simulation-Project/blob/main/BOMB_CIRCUIT.png?raw=true)
 
 
 ## How the Program Works
@@ -32,5 +32,98 @@ The system includes:
 - Initialize the IR receiver:
   ```cpp
   IrReceiver.begin(RECV_PIN, ENABLE_LED_FEEDBACK);
+- Start Serial Monitor for debugging:
+  ```cpp
+  Serial.begin(9600);
+  Serial.println("Push the button");
+- Set buzzer LOW initially:
+  ```cpp
+  digitalWrite(buzzerPin, LOW);
 
+### Main Loop
+- Button Press Detection
+  ```cpp
+  if (buttonState == HIGH && lastButtonState == LOW && !countdownStarted)
 
+ - Activates countdown `(countdownStarted = true).`
+
+ - Sets `countdownValue = 30` and initializes timers `(millis()).`
+
+ ### Countdown Handling
+
+ - Use `millis()` for non-blocking timing:
+   ```cpp
+   if (currentMillis - lastUpdate >= 1000) {
+    countdownValue--;
+    lastUpdate = currentMillis;}
+- LED lights when `countdownValue <= 11.`
+- Bomb detonates if:
+  1. Countdown reaches 0
+  2. Photoresistor detects too much light `(resVal < 200)`
+  3. Wrong IR remote command
+ 
+### Deactivation Conditions
+
+- Correct IR command `(22):`
+```cpp
+ if (IrReceiver.decodedIRData.command == 22) {
+          Serial.println("BOMB DEACTIVATED!");
+```
+- Potentiometer held in range (490-550) for 5 seconds.
+```cpp
+ if (potVal > 490 && potVal < 550) {
+        if (!bombDeactivated && millis() - deactivateTime > 5000) {
+          Serial.println("BOMB DEACTIVATED!");
+```
+### Display Countdown on 2-Digit 7-Segment Display
+
+```cpp
+display_N(countdownValue);
+```
+- Splits number into units and tens:
+  ```cpp
+  int unt = num % 10;
+  int ten = (num / 10) % 10;
+  ```
+  - Uses `segOutput()` to light the correct segments.
+ 
+###  7-Segment Display
+- `segValue[10][7]` array defines which segments (a-g) are ON for each digit (0-9).
+- `segClear()` turns off all segments before displaying new digit.
+- Multiplexing the two digits creates a stable visual output.
+
+### IR Remote
+- Reads data from the remote:
+```cpp
+if (IrReceiver.decode()) { ... }
+```
+- Command `22` deactivates the bomb.
+
+### Potentiometer
+- Acts as a safety key: must remain in correct range for 5 seconds to deactivate the bomb.
+
+### Photoresistor
+- Detects surrounding light; if too bright, the bomb detonates.
+
+### Serial Monitor
+
+- Shows real-time debug information:
+  1. Countdown
+  2. Detonation events
+  3. Deactivation events
+ 
+### Installation
+1. Open the `.ino `file in Arduino IDE or Tinkercad.
+2. Connect components as defined in the code.
+3. Upload the sketch to Arduino.
+4. Monitor Serial output for debug messages.
+
+### Operation
+1. Press the button to start countdown.
+2. Deactivate bomb via:
+   - Correct IR command `(22)`
+   - Potentiometer held steady for 5 seconds
+3. Bomb detonates if:
+   - Countdown reaches 0
+   - Photoresistor detects high light
+   - Wrong IR command received
