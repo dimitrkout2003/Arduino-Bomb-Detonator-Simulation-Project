@@ -21,6 +21,9 @@ The system includes:
 - Potentiometer
 - IR Receiver
 - IR Remote
+##
+![Circuit Screenshot](screenshot.png)
+
 
 ## How the Program Works
 
